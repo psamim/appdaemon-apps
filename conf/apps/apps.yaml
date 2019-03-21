@@ -1,0 +1,4 @@
+hello_world:
+  module: garbage
+  class: Garbage
+
