@@ -1,2 +1,5 @@
 #venv
 venv
+
+#hass conf
+conf/appdaemon.yaml
