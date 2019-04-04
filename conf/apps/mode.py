@@ -61,41 +61,44 @@ class Mode(hass.Hass):
         self.log("media_episode: " + (media_episode or 0))
 
         if mode == "TV":
-            if self.is_tv_mode_first_played == True and new == 'playing' and (type == "tvshow" or type == "movie"):
-                # if new == 'playing' and (type == "tvshow" or type == "movie"):
-                self.log("firt time after TV mode entered")
-                self.is_tv_mode_first_played = False
-                lights.turn_off_all_lights()
+            self.tv_mode(new, type, lights, media_title,
+                         media_series_title, media_episode, old)
 
-                if type == "movie":
-                    lights.light("desktop", "on")
-                    self.call_service(
-                        'tts/google_say',
-                        entity_id='media_player.google_home',
-                        message='playing {}. Enjoy!'.format(media_title))
-                if type == "tvshow":
-                    lights.light("doorway", "on")
-                    self.call_service(
-                        'tts/google_say',
-                        entity_id='media_player.google_home',
-                        message='playing {}, episode {}.{}. Enjoy!'.format(media_series_title, media_episode, media_title))
+    def tv_mode(self, new, type, lights, media_title, media_series_title, media_episode, old):
+        if type == "tvshow" or type == "movie":
+            if self.is_tv_mode_first_played == True and new == 'playing':
+                self.tv_mode_first_time(
+                    lights, type, media_title, media_series_title, media_episode)
 
-            elif old == 'paused' and new == 'playing' and (type == "tvshow" or type == "movie"):
+            elif old == 'paused' and new == 'playing':
                 lights.light("under_cabinet", "off")
-            elif old == 'playing' and new == "paused" and (type == "tvshow" or type == "movie"):
+            elif old == 'playing' and new == "paused":
                 lights.light("under_cabinet", "on")
-            elif old == 'playing' and new == "idle":
-                lights.light("under_cabinet", "on")
-            elif new == 'playing' and type == "music":
-                lights.neolight_effect("jackcandle")
-            elif old == 'playing' and (new is None or new is "idle") and self.previous_type == "music":
-                self.log("stop music")
-                lights.neolight_color(0, 0, 0, 0)
 
-    def run(self, kwargs):
-        self.log("hello")
-        self.call_service(
-            'media_player/kodi_call_method',
-            entity_id="media_player.kodi",
-            method="JSONRPC.Permission"
-        )
+        if old == 'playing' and new != "playing" and self.previous_type == "music":
+            self.log("stop music")
+            lights.neolight_color(0, 0, 0, 0)
+        if old == 'playing' and new == "idle" and self.previous_type != "music":
+            lights.light("under_cabinet", "on")
+        if new == 'playing' and type == "music":
+            self.log("JACK")
+            lights.neolight_effect("jackcandle")
+
+    def tv_mode_first_time(self, lights, type, media_title, media_series_title, media_episode):
+        self.log("firt time after TV mode entered")
+
+        self.is_tv_mode_first_played = False
+        lights.turn_off_all_lights()
+
+        if type == "movie":
+            lights.light("desktop", "on")
+            self.call_service(
+                'tts/google_say',
+                entity_id='media_player.google_home',
+                message='playing {}. Enjoy!'.format(media_title))
+        if type == "tvshow":
+            lights.light("doorway", "on")
+            self.call_service(
+                'tts/google_say',
+                entity_id='media_player.google_home',
+                message='playing {}, episode {}.{}. Enjoy!'.format(media_series_title, media_episode, media_title))
