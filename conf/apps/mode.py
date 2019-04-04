@@ -6,13 +6,14 @@ INPUT_MODE = "input_select.mode"
 
 class Mode(hass.Hass):
     is_tv_mode_first_played = False
+    previous_type = "idle"
 
     def initialize(self):
         time = datetime.time(0, 0, 0)
         self.listen_state(self.on_kodi_change, "media_player.kodi")
         self.listen_state(self.on_mode_change, INPUT_MODE)
 
-    def publish_kodi_notification(self, title, message, image):
+    def publish_kodi_notification(self, title, message, image=None):
         self.call_service(
             'media_player/kodi_call_method',
             entity_id="media_player.kodi",
@@ -35,26 +36,61 @@ class Mode(hass.Hass):
                 "Normal Mode Activated", "Mode Changed", "smb://192.168.31.20/share/Kodi/icons/hologram.png")
 
     def on_kodi_change(self, entity, attribute, old, new, kwargs):
+        lights = self.get_app("lights")
         mode = self.get_state(INPUT_MODE)
         kodi_attributes = self.get_state(
             "media_player.kodi", attribute="attributes")
+
+        self.log("previous_type: " + str(self.previous_type))
         type = kodi_attributes.get("media_content_type")
+        if type != self.previous_type:
+            self.previous_type = type
+        media_title = kodi_attributes.get("media_title")
+        media_title = kodi_attributes.get("media_title")
+        media_series_title = kodi_attributes.get("media_series_title")
+        media_episode = str(kodi_attributes.get("media_episode"))
 
         self.log("new on change: " + new)
-        self.log("kodi_attributes: " + str(kodi_attributes))
+        self.log("old on change: " + old)
+
+        # self.log("kodi_attributes: " + str(kodi_attributes))
         self.log("Mode: " + mode)
-        self.log("type: " + (type or "none"))
+        self.log("type: " + str(type))
+        self.log("media_title: " + (media_title or "none"))
+        self.log("media_series_title: " + (media_series_title or "none"))
+        self.log("media_episode: " + (media_episode or 0))
 
         if mode == "TV":
             if self.is_tv_mode_first_played == True and new == 'playing' and (type == "tvshow" or type == "movie"):
-                self.log("im here 0")
+                # if new == 'playing' and (type == "tvshow" or type == "movie"):
+                self.log("firt time after TV mode entered")
                 self.is_tv_mode_first_played = False
-            elif new == 'playing' and (type == "tvshow" or type == "movie"):
-                self.log("im here 1")
+                lights.turn_off_all_lights()
+
+                if type == "movie":
+                    lights.light("desktop", "on")
+                    self.call_service(
+                        'tts/google_say',
+                        entity_id='media_player.google_home',
+                        message='playing {}. Enjoy!'.format(media_title))
+                if type == "tvshow":
+                    lights.light("doorway", "on")
+                    self.call_service(
+                        'tts/google_say',
+                        entity_id='media_player.google_home',
+                        message='playing {}, episode {}.{}. Enjoy!'.format(media_series_title, media_episode, media_title))
+
+            elif old == 'paused' and new == 'playing' and (type == "tvshow" or type == "movie"):
+                lights.light("under_cabinet", "off")
             elif old == 'playing' and new == "paused" and (type == "tvshow" or type == "movie"):
-                self.log("im here 2")
-            elif new == 'playing' and type == "song":
-                self.log("im here 3")
+                lights.light("under_cabinet", "on")
+            elif old == 'playing' and new == "idle":
+                lights.light("under_cabinet", "on")
+            elif new == 'playing' and type == "music":
+                lights.neolight_effect("jackcandle")
+            elif old == 'playing' and (new is None or new is "idle") and self.previous_type == "music":
+                self.log("stop music")
+                lights.neolight_color(0, 0, 0, 0)
 
     def run(self, kwargs):
         self.log("hello")
