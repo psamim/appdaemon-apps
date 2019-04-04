@@ -91,7 +91,6 @@ class Mode(hass.Hass):
         lights.turn_off_all_lights()
 
         if type == "movie":
-            lights.light("desktop", "on")
             self.call_service(
                 'tts/google_say',
                 entity_id='media_player.google_home',
