@@ -1,4 +1,7 @@
-hello_world:
+garbage:
   module: garbage
   class: Garbage
+mode:
+  module: mode
+  class: Mode
 
