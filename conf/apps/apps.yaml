@@ -4,4 +4,7 @@ garbage:
 mode:
   module: mode
   class: Mode
+lights:
+  module: lights
+  class: Lights
 
