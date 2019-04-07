@@ -5,18 +5,13 @@ INPUT_MODE = "input_select.mode"
 
 
 class Mode(hass.Hass):
-    is_tv_mode_first_played = False
+    tv_mode_last_played = "none"
     previous_type = "idle"
 
     def initialize(self):
         time = datetime.time(5, 0, 0)
         self.listen_state(self.on_kodi_change, "media_player.kodi")
         self.listen_state(self.on_mode_change, INPUT_MODE)
-        self.listen_event(self.kodi_rpc_result,
-                          "kodi_call_method_result")
-
-    def kodi_rpc_result(self, event_name, data, kwargs):
-        self.log("EVENT NAME: {},DATA: {}".format(event_name, data))
 
     def on_mode_change(self, entity, attribute, old, new, kwargs):
         kodi = self.get_app("kodi")
@@ -26,7 +21,7 @@ class Mode(hass.Hass):
             sound.say('TV mode activated!')
             kodi.notify(
                 "TV Mode Activated", "Mode Changed", "smb://192.168.31.20/share/Kodi/icons/movie.png")
-            self.is_tv_mode_first_played = True
+            self.tv_mode_last_played = 'none'
         elif new == "Normal":
             self.log("Normal mode entered")
             sound.say('Normal mode')
@@ -65,9 +60,11 @@ class Mode(hass.Hass):
     def tv_mode(self, new, type, lights, media_title, media_series_title, media_episode, old):
         sound = self.get_app("sound")
         if type == "tvshow" or type == "movie":
-            if self.is_tv_mode_first_played == True and new == 'playing':
-                self.tv_mode_first_time(
-                    lights, type, media_title, media_series_title, media_episode)
+            if self.tv_mode_last_played != type and new == 'playing':
+                self.tv_mode_last_played = type
+                lights.turn_off_all_lights()
+                if type == "tvshow":
+                    lights.light("doorway", "on")
 
             elif old == 'paused' and new == 'playing':
                 lights.light("under_cabinet", "off")
@@ -93,7 +90,7 @@ class Mode(hass.Hass):
     def tv_mode_first_time(self, lights, type, media_title, media_series_title, media_episode):
         self.log("first time after TV mode entered")
 
-        self.is_tv_mode_first_played = False
+        self.tv_mode_last_played = type
         lights.turn_off_all_lights()
 
         if type == "tvshow":
