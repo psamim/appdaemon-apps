@@ -9,31 +9,29 @@ class Mode(hass.Hass):
     previous_type = "idle"
 
     def initialize(self):
-        time = datetime.time(0, 0, 0)
+        time = datetime.time(5, 0, 0)
         self.listen_state(self.on_kodi_change, "media_player.kodi")
         self.listen_state(self.on_mode_change, INPUT_MODE)
+        self.listen_event(self.kodi_rpc_result,
+                          "kodi_call_method_result")
 
-    def publish_kodi_notification(self, title, message, image=None):
-        self.call_service(
-            'media_player/kodi_call_method',
-            entity_id="media_player.kodi",
-            method="GUI.ShowNotification",
-            title=title,
-            message=message,
-            image=image,
-            displaytime=3000
-        )
+    def kodi_rpc_result(self, event_name, data, kwargs):
+        self.log("EVENT NAME: {},DATA: {}".format(event_name, data))
 
     def on_mode_change(self, entity, attribute, old, new, kwargs):
-        if new == "TV" and old == "Normal":
+        kodi = self.get_app("kodi")
+        sound = self.get_app("sound")
+        if new == "TV":
             self.log("TV mode entered")
-            self.publish_kodi_notification(
+            sound.say('TV mode activated!')
+            kodi.notify(
                 "TV Mode Activated", "Mode Changed", "smb://192.168.31.20/share/Kodi/icons/movie.png")
             self.is_tv_mode_first_played = True
         elif new == "Normal":
             self.log("Normal mode entered")
-            self.publish_kodi_notification(
-                "Normal Mode Activated", "Mode Changed", "smb://192.168.31.20/share/Kodi/icons/hologram.png")
+            sound.say('Normal mode')
+            kodi.notify(
+                "Normal Mode", "Mode Changed", "smb://192.168.31.20/share/Kodi/icons/hologram.png")
 
     def on_kodi_change(self, entity, attribute, old, new, kwargs):
         lights = self.get_app("lights")
@@ -53,7 +51,7 @@ class Mode(hass.Hass):
         self.log("new on change: " + new)
         self.log("old on change: " + old)
 
-        # self.log("kodi_attributes: " + str(kodi_attributes))
+        self.log("kodi_attributes: " + str(kodi_attributes))
         self.log("Mode: " + mode)
         self.log("type: " + str(type))
         self.log("media_title: " + (media_title or "none"))
@@ -65,6 +63,7 @@ class Mode(hass.Hass):
                          media_series_title, media_episode, old)
 
     def tv_mode(self, new, type, lights, media_title, media_series_title, media_episode, old):
+        sound = self.get_app("sound")
         if type == "tvshow" or type == "movie":
             if self.is_tv_mode_first_played == True and new == 'playing':
                 self.tv_mode_first_time(
@@ -74,6 +73,13 @@ class Mode(hass.Hass):
                 lights.light("under_cabinet", "off")
             elif old == 'playing' and new == "paused":
                 lights.light("under_cabinet", "on")
+
+            if new == "playing" and old != new:
+                if type == "movie":
+                    sound.say('playing {}. Enjoy!'.format(media_title))
+                if type == "tvshow":
+                    sound.say('playing {}, episode {}.{}. Enjoy!'.format(
+                        media_series_title, media_episode, media_title))
 
         if old == 'playing' and new != "playing" and self.previous_type == "music":
             self.log("stop music")
@@ -85,19 +91,10 @@ class Mode(hass.Hass):
             lights.neolight_effect("jackcandle")
 
     def tv_mode_first_time(self, lights, type, media_title, media_series_title, media_episode):
-        self.log("firt time after TV mode entered")
+        self.log("first time after TV mode entered")
 
         self.is_tv_mode_first_played = False
         lights.turn_off_all_lights()
 
-        if type == "movie":
-            self.call_service(
-                'tts/google_say',
-                entity_id='media_player.google_home',
-                message='playing {}. Enjoy!'.format(media_title))
         if type == "tvshow":
             lights.light("doorway", "on")
-            self.call_service(
-                'tts/google_say',
-                entity_id='media_player.google_home',
-                message='playing {}, episode {}.{}. Enjoy!'.format(media_series_title, media_episode, media_title))
