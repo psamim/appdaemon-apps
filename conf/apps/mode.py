@@ -71,7 +71,7 @@ class Mode(hass.Hass):
             elif old == 'playing' and new == "paused":
                 lights.light("under_cabinet", "on")
 
-            if new == "playing" and old != new:
+            if new == "playing" and old == 'idle':
                 if type == "movie":
                     sound.say('playing {}. Enjoy!'.format(media_title))
                 if type == "tvshow":
