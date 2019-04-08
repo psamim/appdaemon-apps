@@ -15,7 +15,7 @@ class Lights(hass.Hass):
             'light/turn_{}'.format(status),
             entity_id='light.{}'.format(light_name))
 
-    def neolight_color(self, r, g, b, w):
+    def neolight_color(self, r=255, g=255, b=255, w=255):
         self.call_service(
             'mqtt/publish',
             payload="{},{},{}".format(r, g, b),

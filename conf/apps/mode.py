@@ -29,14 +29,13 @@ class Mode(hass.Hass):
                 "Normal Mode", "Mode Changed", "smb://192.168.31.20/share/Kodi/icons/hologram.png")
 
     def on_kodi_change(self, entity, attribute, old, new, kwargs):
-        lights = self.get_app("lights")
         mode = self.get_state(INPUT_MODE)
         kodi_attributes = self.get_state(
             "media_player.kodi", attribute="attributes")
 
         self.log("previous_type: " + str(self.previous_type))
         type = kodi_attributes.get("media_content_type")
-        if type != self.previous_type:
+        if type != self.previous_type and type != None:
             self.previous_type = type
         media_title = kodi_attributes.get("media_title")
         media_title = kodi_attributes.get("media_title")
@@ -54,21 +53,24 @@ class Mode(hass.Hass):
         self.log("media_episode: " + (media_episode or 0))
 
         if mode == "TV":
-            self.tv_mode(new, type, lights, media_title,
+            self.tv_mode(new, type, media_title,
                          media_series_title, media_episode, old)
 
-    def tv_mode(self, new, type, lights, media_title, media_series_title, media_episode, old):
+    def tv_mode(self, new, type, media_title, media_series_title, media_episode, old):
         sound = self.get_app("sound")
+        lights = self.get_app("lights")
+        self.log("previous_type #2: " + str(self.previous_type))
+
         if type == "tvshow" or type == "movie":
             if self.tv_mode_last_played != type and new == 'playing':
                 self.tv_mode_last_played = type
                 lights.turn_off_all_lights()
-                if type == "tvshow":
+                if type == "tvshow" and self.now_is_between("sunset", "sunrise"):
                     lights.light("doorway", "on")
 
-            elif old == 'paused' and new == 'playing':
+            elif old == 'paused' and new == 'playing' and self.now_is_between("sunset", "sunrise"):
                 lights.light("under_cabinet", "off")
-            elif old == 'playing' and new == "paused":
+            elif old == 'playing' and new == 'paused' and self.now_is_between("sunset", "sunrise"):
                 lights.light("under_cabinet", "on")
 
             if new == "playing" and old == 'idle':
@@ -78,20 +80,11 @@ class Mode(hass.Hass):
                     sound.say('playing {}, episode {}.{}. Enjoy!'.format(
                         media_series_title, media_episode, media_title))
 
-        if old == 'playing' and new != "playing" and self.previous_type == "music":
+        if old == 'playing' and new != "playing" and self.previous_type == 'music':
             self.log("stop music")
-            lights.neolight_color(0, 0, 0, 0)
-        if old == 'playing' and new == "idle" and self.previous_type != "music":
+            lights.neolight_color(0, 0, 0)
+        if old == 'playing' and new == "idle" and self.previous_type != 'music' and self.now_is_between("sunset", "sunrise"):
             lights.light("under_cabinet", "on")
         if new == 'playing' and type == "music":
             self.log("JACK")
             lights.neolight_effect("jackcandle")
-
-    def tv_mode_first_time(self, lights, type, media_title, media_series_title, media_episode):
-        self.log("first time after TV mode entered")
-
-        self.tv_mode_last_played = type
-        lights.turn_off_all_lights()
-
-        if type == "tvshow":
-            lights.light("doorway", "on")
