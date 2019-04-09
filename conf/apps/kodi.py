@@ -18,7 +18,7 @@ class Kodi(hass.Hass):
             displaytime=3000
         )
 
-    def get_attributes(self):
+    def get_attributes(self, entity, attribute, old, new, kwargs):
         self.kodi_attributes = self.get_state(
             "media_player.kodi", attribute="attributes")
         return self.kodi_attributes
