@@ -13,6 +13,7 @@ class DeviceTracker(hass.Hass):
     def being_home(self, entity, attribute, old, new, kwargs):
         lights = self.get_app("lights")
         mode = self.get_app("mode")
+        sound = self.get_app("sound")
 
         self.log("Self: " + entity + " is " + new)
 
@@ -26,11 +27,13 @@ class DeviceTracker(hass.Hass):
         self.log("P: " + partner_entity + " is " + partner_state)
 
         if new == 'home' and old == 'not_home':
-            mode.set_mode("Normal")
-            if self.now_is_between("sunset", "sunrise"):
-                lights.light("doorway", "on")
-                lights.light("right_side", "on")
-                lights.light("main", "on")
+            sound.say("Welcome Home")
+            if partner_state == 'not_home':
+                mode.set_mode("Normal")
+                if self.now_is_between("sunset", "sunrise"):
+                    lights.light("doorway", "on")
+                    lights.light("right_side", "on")
+                    lights.light("main", "on")
 
         if new == 'not_home' and partner_state == 'not_home':
             mode.set_mode("Not home")
