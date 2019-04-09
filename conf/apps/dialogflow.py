@@ -3,7 +3,7 @@ import appdaemon.plugins.hass.hassapi as hass
 class Dialogflow(hass.Hass):
 
     def initialize(self):
-        pass
+        self.register_endpoint(self.api_call, "dialogflow")
 
     def api_call(self, data):
         intent = self.get_apiai_intent(data)
