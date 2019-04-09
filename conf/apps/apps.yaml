@@ -22,4 +22,7 @@ sound:
 device_tracker:
   module: device_tracker
   class: DeviceTracker
+dialogflow:
+  module: dialogflow
+  class: Dialogflow
 
