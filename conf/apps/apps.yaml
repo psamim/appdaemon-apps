@@ -4,6 +4,9 @@ garbage:
 mode:
   module: mode
   class: Mode
+tv_mode:
+  module: tv_mode
+  class: TvMode
 lights:
   module: lights
   class: Lights
@@ -16,4 +19,7 @@ kodi:
 sound:
   module: sound
   class: Sound
+device_tracker:
+  module: device_tracker
+  class: DeviceTracker
 
