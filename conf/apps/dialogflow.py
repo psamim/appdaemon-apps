@@ -1,6 +1,7 @@
 import appdaemon.plugins.hass.hassapi as hass
 
 GARBAGE_INTENT_NAME = "projects/newagent-bd916/agent/intents/6c5624a3-837b-49cf-90a1-6f537464ea71"
+GARBAGE_DONE_INTENT_NAME = "projects/newagent-bd916/agent/intents/e6ed62be-fb38-419b-8268-ba4fb6a80d2f"
 
 class Dialogflow(hass.Hass):
 
@@ -13,16 +14,29 @@ class Dialogflow(hass.Hass):
         query_result = data.get("queryResult")
         name = None
         intent = None
+
         if query_result is not None:
             intent = query_result.get("intent")
         if intent is not None:
             name = intent.get("name")
+        
+        self.log("Q: " + str(query_result))
+        self.log("I: " + str(intent))
+        self.log("N: " + str(name))
 
-        if name is GARBAGE_INTENT_NAME:
+        if name == GARBAGE_INTENT_NAME:
+            self.log("Garbage intent recieved")
             garbage = self.get_app("garbage")
             if garbage.is_garbage_day():
-                return '{ "fulfillmentText": "Yes, it is" }' , 200
-            return '{ "fulfillmentText": "no, it\'s not" }' , 200
+                return '{ "fulfillmentText": "Yes" }' , 200
+            else:
+                return '{ "fulfillmentText": "no" }' , 200
+
+        if name == GARBAGE_DONE_INTENT_NAME:
+            garbage = self.get_app("garbage")
+            garbage.set_garbage_done()
+            return '{ "fulfillmentText": "OK" }' , 200
+
             
         return '{ "fulfillmentText": "This is hass talking" }' , 200
 

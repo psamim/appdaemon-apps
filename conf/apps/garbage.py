@@ -5,9 +5,16 @@ import datetime
 
 class Garbage(hass.Hass):
     def initialize(self):
-        time = datetime.time(0, 0, 0)
+        self.garbage_done = False
+        time = datetime.time(5, 0, 0)
+        self.run_daily(self.set_garbage_done, time, status=False)
         self.run_hourly(self.check_garbage_day, time)
-
+    
+    def set_garbage_done(self, kwargs ={}):
+        status = kwargs.get("status", True)
+        self.log("setting the garbage done: " + str(status))
+        self.garbage_done = status
+        
     def is_garbage_day(self):
         day = jdatetime.date.today().day
         return day % 2 == 0

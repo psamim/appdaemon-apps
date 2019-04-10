@@ -8,7 +8,7 @@ class ModeNavigate(hass.Hass):
         time = datetime.time(5, 0, 0)
         self.run_daily(self.go_to_normal, time)
 
-    def go_to_normal(self):
+    def go_to_normal(self, kwargs):
         self.call_service(
             'scene/turn_on',
             entity_id="scene.normal"
