@@ -8,10 +8,13 @@ class Garbage(hass.Hass):
         time = datetime.time(0, 0, 0)
         self.run_hourly(self.check_garbage_day, time)
 
-    def check_garbage_day(self, kwargs):
+    def is_garbage_day(self):
         day = jdatetime.date.today().day
+        return day % 2 == 0
+
+    def check_garbage_day(self, kwargs):
         self.log('Checking garbage day')
-        if day % 2 == 0:
+        if self.is_garbage_day():
             self.set_state('binary_sensor.garbage_day', state="YES")
             is_set = self.get_state('input_boolean.garbage_day') == 'on'
             now_time = datetime.datetime.now().time()
