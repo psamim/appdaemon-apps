@@ -6,6 +6,7 @@ class Kodi(hass.Hass):
 
     def initialize(self):
         self.listen_state(self.get_attributes, "media_player.kodi")
+        self.kodi_attributes = {}
 
     def notify(self, title, message, image=None):
         self.call_service(
