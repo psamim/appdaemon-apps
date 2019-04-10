@@ -6,13 +6,6 @@ class Dialogflow(hass.Hass):
         self.register_endpoint(self.api_call, "dialogflow")
 
     def api_call(self, data):
-        intent = self.get_apiai_intent(data)
         self.log(data)
-
-        if intent is None:
-            self.log("Apiai error encountered: Result is empty")
-            return "", 201
-
-        self.log(intent)
-        return "", 200
+        return '{ "fulfillmentText": "This is hass talking" }' , 200
 
