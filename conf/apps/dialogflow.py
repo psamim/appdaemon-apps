@@ -13,7 +13,6 @@ class Dialogflow(hass.Hass):
             self.log("Apiai error encountered: Result is empty")
             return "", 201
 
-        response = self.format_apaiai_response(speech = "I'm sorry, the {} does not exist within AppDaemon".format(intent))
-
-        return response, 200
+        self.log(intent)
+        return "", 200
 
