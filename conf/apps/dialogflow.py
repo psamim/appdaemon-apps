@@ -9,7 +9,12 @@ class Dialogflow(hass.Hass):
 
     def api_call(self, data):
         self.log(data)
+        self.log("type" + str(type(data)))
+       
+
         intent = data.get("intent")
+        self.log("intent" + str(intent))
+        name = ""
         if intent is not None:
             name = intent.get("name")
 
