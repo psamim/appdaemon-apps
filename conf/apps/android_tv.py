@@ -5,7 +5,7 @@ import os
 from androidtv import AndroidTV
 
 
-class AndroidTv(hass.Hass):
+class AndroidTVApp(hass.Hass):
 
     def initialize(self):
         self.android = AndroidTV(

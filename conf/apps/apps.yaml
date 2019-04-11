@@ -26,6 +26,6 @@ dialogflow:
   module: dialogflow
   class: Dialogflow
 androidtv:
-  module: androidtv
-  class: AndroidTv
+  module: android_tv
+  class: AndroidTVApp
 
