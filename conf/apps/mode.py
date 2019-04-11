@@ -1,8 +1,6 @@
 import appdaemon.plugins.hass.hassapi as hass
 import datetime
 
-from androidtv import AndroidTV
-
 
 class Mode(hass.Hass):
     tv_mode_last_played = "none"
@@ -11,8 +9,6 @@ class Mode(hass.Hass):
     def initialize(self):
         #time = datetime.time(5, 0, 0)
         self.listen_state(self.on_mode_change, "input_select.mode")
-        self.android = AndroidTV(
-            '192.168.31.137:5555', adbkey='/home/homeassistant/.android/adbkey')
 
     def set_mode(self, mode):
         self.call_service(
@@ -30,7 +26,6 @@ class Mode(hass.Hass):
 
         if new == "TV":
             self.log("TV mode entered")
-            self.android._adb_shell_python_adb("monkey -p org.xbmc.kodi 1")
             sound.say('TV mode activated!')
             kodi.notify(
                 "TV Mode Activated", "Mode Changed", "smb://192.168.31.20/share/Kodi/icons/movie.png")
