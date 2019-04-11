@@ -27,8 +27,6 @@ class Mode(hass.Hass):
     def on_mode_change(self, entity, attribute, old, new, kwargs):
         kodi = self.get_app("kodi")
         sound = self.get_app("sound")
-        self.android._adb_shell_python_adb("monkey -p org.xbmc.kodi 1")
-        self.log("androidTV state:" + str(self.android.get_properties()))
 
         if new == "TV":
             self.log("TV mode entered")
