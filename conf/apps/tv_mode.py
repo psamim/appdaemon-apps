@@ -8,6 +8,22 @@ class TvMode(hass.Hass):
 
     def initialize(self):
         self.listen_state(self.on_kodi_change, "media_player.kodi")
+        self.listen_state(self.on_android_tv_change, "media_player.android_tv")
+
+    def on_android_tv_change(self, entity, attribute, old, new, kwargs):
+        mode = self.get_app("mode")
+        lights = self.get_app("lights")
+        androidtv = self.get_app("androidtv")
+
+        current_mode = mode.get_mode()
+        app_id = androidtv.get_app_id()
+        androidtv_available = androidtv.is_available()
+
+        if current_mode == "TV" and androidtv_available:
+            if new == 'playing' and old != new and app_id != "org.xbmc.kodi":
+                lights.neolight_effect("jackcandle")
+            if new != "playing" and app_id != "org.xbmc.kodi":
+                lights.neolight_color(0, 0, 0)
 
     def on_kodi_change(self, entity, attribute, old, new, kwargs):
         mode = self.get_app("mode")

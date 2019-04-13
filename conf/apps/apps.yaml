@@ -25,4 +25,7 @@ device_tracker:
 dialogflow:
   module: dialogflow
   class: Dialogflow
+androidtv:
+  module: android_tv
+  class: AndroidTVApp
 
