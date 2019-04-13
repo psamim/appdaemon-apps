@@ -2,6 +2,7 @@ import appdaemon.plugins.hass.hassapi as hass
 
 GARBAGE_INTENT_NAME = "projects/newagent-bd916/agent/intents/6c5624a3-837b-49cf-90a1-6f537464ea71"
 GARBAGE_DONE_INTENT_NAME = "projects/newagent-bd916/agent/intents/e6ed62be-fb38-419b-8268-ba4fb6a80d2f"
+PLAY_MOVIE = "projects/newagent-bd916/agent/intents/e48fcd42-3374-4430-a303-4189ecc34332"
 
 class Dialogflow(hass.Hass):
 
@@ -36,6 +37,14 @@ class Dialogflow(hass.Hass):
             garbage = self.get_app("garbage")
             garbage.set_garbage_done()
             return '{ "fulfillmentText": "OK" }' , 200
+
+        if name == PLAY_MOVIE:
+            parameters = query_result.get("parameters")
+            if parameters is not None:
+                movie = parameters.get("movie")
+                self.log(movie)
+            return '{ "fulfillmentText": "OK" }' , 200
+
 
             
         return '{ "fulfillmentText": "This is hass talking" }' , 200
