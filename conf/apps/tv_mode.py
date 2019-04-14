@@ -16,7 +16,7 @@ class TvMode(hass.Hass):
         androidtv = self.get_app("androidtv")
 
         current_mode = mode.get_mode()
-        app_id = androidtv.get_app_id()
+        app_id = androidtv.get_current_app_id()
         androidtv_available = androidtv.is_available()
 
         if current_mode == "TV" and androidtv_available:

@@ -13,8 +13,7 @@ class Kodi(hass.Hass):
 
     def find_movie(self, pattern):
         androidtv = self.get_app("androidtv")
-        if androidtv.get_current_app_id() is not "org.xbmc.kodi":
-            androidtv.open_app("org.xbmc.kodi")
+        androidtv.open_app("org.xbmc.kodi")
         response = request(URL, "VideoLibrary.GetMovies")
         movies = response.data.result.get("movies", None)
         if movies is None:
