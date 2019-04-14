@@ -21,9 +21,27 @@ class AndroidTVApp(hass.Hass):
         return self.android
 
     def open_app(self, package):
-        android = self.get_android()
+        # android = self.get_android()
+        self.call_service(
+            'androidtv/adb_command',
+            entity_id='media_player.android_tv',
+            command="monkey -p {} 1".format(package))
         self.log("open app: "+package)
-        android._adb_shell_python_adb("monkey -p {} 1".format(package))
+        # android._adb_shell_python_adb("monkey -p {} 1".format(package))
+
+    def turn_on(self):
+        # android = self.get_android()
+        # android.turn_on()
+        self.call_service(
+            'androidtv/adb_command',
+            entity_id='media_player.android_tv',
+            command="dumpsys power | grep 'Display Power' | grep -q 'state=ON'||input keyevent 26")
+
+    def turn_off(self):
+        self.call_service(
+            'androidtv/adb_command',
+            entity_id='media_player.android_tv',
+            command="dumpsys power | grep 'Display Power' | grep -q 'state=ON'&&input keyevent 26")
 
     def get_current_app_id(self):
         self.adroidtv_attributes = self.get_state(
