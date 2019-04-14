@@ -25,4 +25,7 @@ dialogflow:
 androidtv:
   module: android_tv
   class: AndroidTVApp
+charge:
+  module: charge
+  class: Charge
 
