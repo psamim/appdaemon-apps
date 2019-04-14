@@ -7,7 +7,8 @@ class Mode(hass.Hass):
     previous_type = "idle"
 
     def initialize(self):
-        #time = datetime.time(5, 0, 0)
+        time = datetime.time(5, 0, 0)
+        self.run_daily(self.set_mode('normal'), time)
         self.listen_state(self.on_mode_change, "input_select.mode")
 
     def set_mode(self, mode):

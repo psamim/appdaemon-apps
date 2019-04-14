@@ -10,9 +10,6 @@ tv_mode:
 lights:
   module: lights
   class: Lights
-mode_navigate:
-  module: mode_navigate
-  class: ModeNavigate
 kodi:
   module: kodi
   class: Kodi
