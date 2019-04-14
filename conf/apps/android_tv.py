@@ -13,9 +13,17 @@ class AndroidTVApp(hass.Hass):
         # self.listen_state(self.get_attributes, "media_player.android_tv")
         self.log("android tv available: {}".format(self.android.available))
 
+    def get_android(self):
+        if not self.android.available:
+            self.android = AndroidTV(
+                '192.168.31.137:5555', adbkey='{}/.android/adbkey'.format(os.path.expanduser('~')))
+
+        return self.android
+
     def open_app(self, package):
-        self.log("open app"+package)
-        self.android._adb_shell_python_adb("monkey -p {} 1".format(package))
+        android = self.get_android()
+        self.log("open app: "+package)
+        android._adb_shell_python_adb("monkey -p {} 1".format(package))
 
     def get_app_id(self):
         self.adroidtv_attributes = self.get_state(
@@ -24,4 +32,5 @@ class AndroidTVApp(hass.Hass):
         return self.app_id
 
     def is_available(self):
-        return self.android.available
+        android = self.get_android()
+        return android.available
