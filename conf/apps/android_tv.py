@@ -27,7 +27,8 @@ class AndroidTVApp(hass.Hass):
 
     def get_current_app_id(self):
         android = self.get_android()
-        current_app_id = android._current_app()
+        _, current_app_id, _, _, _ = android.update()
+
         # self.adroidtv_attributes = self.get_state(
         #     "media_player.android_tv", attribute="attributes")
         # self.app_id = self.adroidtv_attributes.get("app_id")
