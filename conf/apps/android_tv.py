@@ -26,12 +26,9 @@ class AndroidTVApp(hass.Hass):
         android._adb_shell_python_adb("monkey -p {} 1".format(package))
 
     def get_current_app_id(self):
-        android = self.get_android()
-        _, current_app_id, _, _, _ = android.update()
-
-        # self.adroidtv_attributes = self.get_state(
-        #     "media_player.android_tv", attribute="attributes")
-        # self.app_id = self.adroidtv_attributes.get("app_id")
+        self.adroidtv_attributes = self.get_state(
+            "media_player.android_tv", attribute="attributes")
+        current_app_id = self.adroidtv_attributes.get("app_id")
         return current_app_id
 
     def is_available(self):
