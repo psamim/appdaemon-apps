@@ -46,7 +46,9 @@ class Dialogflow(hass.Hass):
                 found = kodi.find_movie(movie)
                 self.log(found)
                 if len(found):
-                    return '{ "fulfillmentText": "%s" }' % found[0].get(
+                    movie = found[0]
+                    kodi.play_movie(movie.get("movieid"))
+                    return '{ "fulfillmentText": "%s" }' % movie.get(
                         "label"), 200
                 else:
                     return '{ "fulfillmentText": "Not found" }', 200
