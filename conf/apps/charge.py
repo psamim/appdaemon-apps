@@ -8,8 +8,4 @@ class Charge(hass.Hass):
 
 
     def listen(self, entity, attribute, old, new, kwargs):
-        self.log(new)
-        if new == 'home':
-            self.turn_on("light.right_side")
-        else:
-            self.turn_off("light.right_side")
+        pass
