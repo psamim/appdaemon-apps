@@ -11,6 +11,8 @@ class DeviceTracker(hass.Hass):
                           'device_tracker.nexus')
 
     def being_home(self, entity, attribute, old, new, kwargs):
+        if new == old:
+            return
         lights = self.get_app("lights")
         mode = self.get_app("mode")
         sound = self.get_app("sound")

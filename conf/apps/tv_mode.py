@@ -11,6 +11,8 @@ class TvMode(hass.Hass):
         self.listen_state(self.on_android_tv_change, "media_player.android_tv")
 
     def on_android_tv_change(self, entity, attribute, old, new, kwargs):
+        if new == old:
+            return
         mode = self.get_app("mode")
         lights = self.get_app("lights")
         androidtv = self.get_app("androidtv")
@@ -26,6 +28,9 @@ class TvMode(hass.Hass):
                 lights.neolight_color(0, 0, 0)
 
     def on_kodi_change(self, entity, attribute, old, new, kwargs):
+        if new == old:
+            return
+        self.log("kodiOnChange new={}, old={}".format(str(new), str(old)))
         mode = self.get_app("mode")
         sound = self.get_app("sound")
         lights = self.get_app("lights")
@@ -41,8 +46,10 @@ class TvMode(hass.Hass):
             self.previous_type = media_content_type
 
         if current_mode == "TV":
+            self.log("enter tv mode IF")
 
             if media_content_type == "tvshow" or media_content_type == "movie":
+                self.log("enter tvshow/movie IF")
                 if self.tv_mode_last_played != media_content_type and new == 'playing':
                     self.tv_mode_last_played = media_content_type
                     lights.turn_off_all_lights()
@@ -55,6 +62,7 @@ class TvMode(hass.Hass):
                     lights.light("under_cabinet", "on")
 
                 if new == "playing" and old == 'idle':
+                    self.log("idle to playing")
                     if media_content_type == "movie":
                         sound.say('playing {}. Enjoy!'.format(media_title))
                     if media_content_type == "tvshow":

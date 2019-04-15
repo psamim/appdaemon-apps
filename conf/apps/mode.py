@@ -22,6 +22,8 @@ class Mode(hass.Hass):
         return self.get_state('input_select.mode')
 
     def on_mode_change(self, entity, attribute, old, new, kwargs):
+        if new == old:
+            return
         kodi = self.get_app("kodi")
         sound = self.get_app("sound")
 
