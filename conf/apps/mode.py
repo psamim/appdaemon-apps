@@ -36,7 +36,7 @@ class Mode(hass.Hass):
         elif new == "Normal":
 
             self.log("Normal mode entered")
-            sound.say('Normal mode')
+            # sound.say('Normal mode')
             kodi.notify(
                 "Normal Mode", "Mode Changed", "smb://192.168.31.20/share/Kodi/icons/hologram.png")
         elif new == "Not home":
