@@ -28,6 +28,9 @@ class Kodi(hass.Hass):
     def play_movie(self, movie_id):
         request(URL, "Player.Open", item={"movieid": movie_id})
 
+    def scan_library(self):
+        request(URL, "VideoLibrary.Scan")
+
     def notify(self, title, message, image=None):
         self.call_service('media_player/kodi_call_method',
                           entity_id="media_player.kodi",
