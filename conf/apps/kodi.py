@@ -28,6 +28,28 @@ class Kodi(hass.Hass):
     def play_movie(self, movie_id):
         request(URL, "Player.Open", item={"movieid": movie_id})
 
+    def find_artist(self, pattern):
+        androidtv = self.get_app("androidtv")
+        androidtv.turn_on()
+        androidtv.open_app("org.xbmc.kodi")
+        response = request(URL, "AudioLibrary.GetArtists")
+        artists = response.data.result.get("artists", None)
+        if artists is None:
+            return
+
+        found = list(
+            filter(lambda m: re.search("\\b"+pattern+"s?\\b", m.get("label"), re.IGNORECASE),
+                   artists))
+        return found
+
+    def play_song(self, artist_id):
+        request(URL, "Player.Open", item={
+                "artistid": artist_id}, options={"shuffled": True})
+        request(URL, "GUI.SetFullscreen", fullscreen=True)
+
+    def play_partymode(self):
+        request(URL, "Player.Open", item={"partymode": "music"})
+
     def scan_library(self):
         request(URL, "VideoLibrary.Scan")
 
