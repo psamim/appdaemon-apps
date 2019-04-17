@@ -13,15 +13,15 @@ class TvMode(hass.Hass):
     def on_android_tv_change(self, entity, attribute, old, new, kwargs):
         if new == old:
             return
-        mode = self.get_app("mode")
+        # mode = self.get_app("mode")
         lights = self.get_app("lights")
         androidtv = self.get_app("androidtv")
 
-        current_mode = mode.get_mode()
+        # current_mode = mode.get_mode()
         app_id = androidtv.get_current_app_id()
         androidtv_available = androidtv.is_available()
 
-        if current_mode == "TV" and androidtv_available:
+        if androidtv_available:
             if new == 'playing' and old != new and app_id != "org.xbmc.kodi":
                 lights.neolight_effect("jackcandle")
             if new != "playing" and app_id != "org.xbmc.kodi":
@@ -68,10 +68,11 @@ class TvMode(hass.Hass):
                     if media_content_type == "tvshow":
                         sound.say('playing {}, episode {}.{}. Enjoy!'.format(
                             media_series_title, media_episode, media_title))
-
-            if old == 'playing' and new != "playing" and self.previous_type == 'music':
-                lights.neolight_color(0, 0, 0)
             if old == 'playing' and new == "idle" and self.previous_type != 'music' and self.now_is_between("sunset", "sunrise"):
                 lights.light("under_cabinet", "on")
-            if new == 'playing' and media_content_type == "music":
-                lights.neolight_effect("jackcandle")
+
+        if old == 'playing' and new != "playing" and self.previous_type == 'music':
+            lights.neolight_color(0, 0, 0)
+
+        if new == 'playing' and media_content_type == "music":
+            lights.neolight_effect("jackcandle")
