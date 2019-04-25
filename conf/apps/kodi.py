@@ -17,13 +17,32 @@ class Kodi(hass.Hass):
         androidtv.open_app("org.xbmc.kodi")
         response = request(URL, "VideoLibrary.GetMovies")
         movies = response.data.result.get("movies", None)
+
+        def remove_extra_chars1(movie):
+            label = re.sub("[-:]", "", movie.get("label"))
+            return {**movie, "label": label}
+
+        def remove_extra_chars2(movie):
+            label = re.sub("-", " ", movie.get("label"))
+            return {**movie, "label": label}
+
         if movies is None:
             return
 
+        edited_movies1 = list(
+            map(remove_extra_chars1, movies))
+        edited_movies2 = list(
+            map(remove_extra_chars2, movies))
+        edited_movies = edited_movies1 + edited_movies2 + movies
+
+        self.log("## EDITED_MOVIES: {}".format(str(edited_movies)))
+
         found = list(
             filter(lambda m: re.search(pattern, m.get("label"), re.IGNORECASE),
-                   movies))
-        return found
+                   edited_movies))
+        sorted_movies = list(sorted(found, key=lambda s: len(
+            s.get("label"))))
+        return sorted_movies
 
     def play_movie(self, movie_id):
         request(URL, "Player.Open", item={"movieid": movie_id})
