@@ -49,30 +49,32 @@ class TvMode(hass.Hass):
             self.log("enter tv mode IF")
 
             if media_content_type == "tvshow" or media_content_type == "movie":
-                self.log("enter tvshow/movie IF")
-                if self.tv_mode_last_played != media_content_type and new == 'playing':
+                # play tvshow and movie after idle
+                if new == "playing" and old == 'idle':
+                    self.log("idle to playing")
                     self.tv_mode_last_played = media_content_type
                     lights.turn_off_all_lights()
-                    if media_content_type == "tvshow" and self.now_is_between("sunset", "sunrise"):
-                        lights.light("doorway", "on")
+                    if media_content_type == "movie":
+                        sound.say('playing {}. Enjoy!'.format(media_title))
+                    if media_content_type == "tvshow":
+                        sound.say('playing {}, episode {}.{}. Enjoy!'.format(
+                            media_series_title, media_episode, media_title))
+                        if self.now_is_between("sunset", "sunrise"):
+                            lights.light("doorway", "on")
 
                 elif old == 'paused' and new == 'playing' and self.now_is_between("sunset", "sunrise"):
                     lights.light("under_cabinet", "off")
                 elif old == 'playing' and new == 'paused' and self.now_is_between("sunset", "sunrise"):
                     lights.light("under_cabinet", "on")
 
-                if new == "playing" and old == 'idle':
-                    self.log("idle to playing")
-                    if media_content_type == "movie":
-                        sound.say('playing {}. Enjoy!'.format(media_title))
-                    if media_content_type == "tvshow":
-                        sound.say('playing {}, episode {}.{}. Enjoy!'.format(
-                            media_series_title, media_episode, media_title))
+            # turn on undercabinet on stop (tvshow and movie)
             if old == 'playing' and new == "idle" and self.previous_type != 'music' and self.now_is_between("sunset", "sunrise"):
                 lights.light("under_cabinet", "on")
 
+        # turn off neolight on stop and pause kodi music
         if old == 'playing' and new != "playing" and self.previous_type == 'music':
             lights.neolight_color(0, 0, 0)
 
+        # turn neolight effect to jackcandle, on kodi music play
         if new == 'playing' and media_content_type == "music":
             lights.neolight_effect("jackcandle")
