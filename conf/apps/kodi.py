@@ -35,8 +35,6 @@ class Kodi(hass.Hass):
             map(remove_extra_chars2, movies))
         edited_movies = edited_movies1 + edited_movies2 + movies
 
-        self.log("## EDITED_MOVIES: {}".format(str(edited_movies)))
-
         found = list(
             filter(lambda m: re.search(pattern, m.get("label"), re.IGNORECASE),
                    edited_movies))
