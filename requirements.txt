@@ -17,7 +17,7 @@ idna==2.8
 idna-ssl==1.1.0
 iso8601==0.1.12
 jdatetime==3.2.0
-Jinja2==2.10
+Jinja2==2.11.3
 jsonrpcclient==3.3.1
 jsonschema==2.6.0
 libusb1==1.7
