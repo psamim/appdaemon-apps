@@ -28,7 +28,7 @@ pure-python-adb-homeassistant==0.1.6.dev0
 pyasn1==0.4.5
 pycparser==2.19
 pytz==2018.9
-PyYAML==3.13
+PyYAML==5.4
 requests==2.21.0
 rsa==4.0
 six==1.12.0
