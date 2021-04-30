@@ -30,7 +30,7 @@ pycparser==2.19
 pytz==2018.9
 PyYAML==3.13
 requests==2.21.0
-rsa==4.0
+rsa==4.7
 six==1.12.0
 sseclient==0.0.23
 typing==3.6.6
